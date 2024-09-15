@@ -6,7 +6,7 @@ Designer  Tim;
 Company   Tim;
 Assembly  None;
 Location  None;
-Device    g22V10;
+Device    g22V10; /* target:ATF22V10C */
 
 /*
     Register Selector Selection, per RSS/2
