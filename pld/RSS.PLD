@@ -1,0 +1,47 @@
+Name      RSS;
+Partno    RSS;
+Date      2024;
+Revision  00;
+Designer  Tim;
+Company   Tim;
+Assembly  None;
+Location  None;
+Device    g22V10;
+
+/*
+    Register Selector Selection, per RSS/2
+
+    Input:
+        RSS/2, MRS/3, IRS/3, IORSA/3, IORSB/3
+
+    Output:
+        RS/3: Register Selector
+    Logic:
+        RS/3   = RSS{0:MRS, 1:IRS, 2:IORSA, 3:IORSB}
+
+    Device pin ranges:
+        i:   01 .. 11, 13
+        i/o: 14 .. 23
+*/
+
+/* Input */
+PIN [1..2]   = [RSS1..0];
+PIN [3..5]   = [MRS0..2];
+PIN [6..8]   = [IRS0..2];
+PIN [9..11]  = [IORSA0..2];
+PIN [13..15] = [IORSB0..2];
+
+/* Input */
+PIN [16..18] = [RS0..2];
+
+/* Immediates */
+field sel    = [RSS0..1];
+field output = [RS0..2];
+
+/* Logic */
+output
+    = [   MRS0..2] & sel:0
+    # [   IRS0..2] & sel:1
+    # [ IORSA0..2] & sel:2
+    # [ IORSB0..2] & sel:3
+    ;
