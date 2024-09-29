@@ -1,0 +1,23 @@
+
+CUPL(WM)        5.0a  Serial# MW-10400000
+Device          g16v8as  Library DLIB-h-40-2
+Created         Sat Sep 28 19:48:36 2024
+Name            ROOT
+Partno          ROOT
+Revision        00
+Date            2024
+Designer        Tim
+Company         Tim
+Assembly        None
+Location        None
+*QP20 
+*QF2194 
+*G0 
+*F0 
+*L02048 00000000010100100100111101001111
+*L02080 01010100000000000000000000000000
+*L02112 00000000111111111111111111111111
+*L02144 11111111111111111111111111111111
+*L02176 111111111111111110
+*C0B50
+*71DB

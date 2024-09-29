@@ -1,0 +1,39 @@
+Name      ROOT;
+Partno    ROOT;
+Date      2024;
+Revision  00;
+Designer  Tim;
+Company   Tim;
+Assembly  None;
+Location  None;
+Device    g16v8a; /* target:ATF16V8B */
+
+/*
+    Root module logic: Clock and reset management:
+        CLK = OR( 555.output, TC1232.reset, c.HALT)
+
+    Input:
+        RSS/2, MRS/3, IRS/3, IORSA/3, IORSB/3
+    Output:
+        RS/3: Register Selector
+    Logic:
+        CLK = OR( 555.output, TC1232.reset, c.HALT)
+
+    Device pins:
+        Vcc:   20
+        GND:   10
+        i/clk: 01
+        i:     02 .. 09
+        i//OE: 11
+        i/o:   12 .. 19
+*/
+
+/* Input */
+PIN 1 = 555out;  /* TODO: everything */
+
+/* Output */
+
+/* Immediates */
+
+/* Logic */
+
