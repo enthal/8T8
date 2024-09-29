@@ -18,7 +18,7 @@ Device    g16v8a; /* target:ATF16V8B */
     Logic:
         CLK = OR( CLK_in, RESET_in, HALT )
 
-    Device pins:
+    Device pins: ATF16V8B:
         Vcc:   20
         GND:   10
         i/clk: 01

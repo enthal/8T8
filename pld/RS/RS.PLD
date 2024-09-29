@@ -21,7 +21,7 @@ Device    g22V10; /* target:ATF22V10C */
         - LE/5 : Latch enable register i (A mix of Active HIGH and LOW), ANDed with CLK
     Logic:
 
-    Device pins:
+    Device pins: ATF22V10C:
         Vcc: 24
         GND: 12
         i:   01 .. 11, 13

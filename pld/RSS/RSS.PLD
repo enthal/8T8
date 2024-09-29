@@ -19,7 +19,7 @@ Device    g22V10; /* target:ATF22V10C */
     Logic:
         RS/3   = RSS{0:MRS, 1:IRS, 2:IORSA, 3:IORSB}
 
-    Device pins:
+    Device pins: ATF22V10C:
         Vcc: 24
         GND: 12
         i:   01 .. 11, 13
