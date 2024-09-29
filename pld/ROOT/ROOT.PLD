@@ -9,15 +9,14 @@ Location  None;
 Device    g16v8a; /* target:ATF16V8B */
 
 /*
-    Root module logic: Clock and reset management:
-        CLK = OR( 555.output, TC1232.reset, c.HALT)
+    Root module logic: Clock and reset management
 
     Input:
-        RSS/2, MRS/3, IRS/3, IORSA/3, IORSB/3
+        CLK_in, RESET_in, HALT
     Output:
-        RS/3: Register Selector
+        CLK, not_CLK, RESET, not_RESET
     Logic:
-        CLK = OR( 555.output, TC1232.reset, c.HALT)
+        CLK = OR( CLK_in, RESET_in, HALT )
 
     Device pins:
         Vcc:   20
@@ -29,11 +28,21 @@ Device    g16v8a; /* target:ATF16V8B */
 */
 
 /* Input */
-PIN 1 = 555out;  /* TODO: everything */
+PIN 2 = CLK_in;
+PIN 3 = RESET_in;
+PIN 4 = HALT;
 
 /* Output */
-
-/* Immediates */
+PIN 19 = CLK;
+PIN 18 = not_CLK;
+PIN 17 = RESET;
+PIN 16 = not_RESET;
 
 /* Logic */
 
+c         = CLK_in # RESET_in # HALT;
+
+CLK       =  c;
+not_CLK   = !c;
+RESET     =  RESET_in;
+not_RESET = !RESET_in;
