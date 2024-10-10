@@ -1,0 +1,56 @@
+Name      RS;
+Partno    RS;
+Date      2024;
+Revision  00;
+Designer  Tim;
+Company   Tim;
+Assembly  None;
+Location  None;
+Device    g22V10; /* target:ATF22V10C */
+
+/*
+    Register Selection
+
+    Input:
+        - CLK  : Clock
+        - DSRB : Drive Selected Register to Bus
+        - LSRB : Latch Selected Register from Bus
+        - RS/3 : Register Selector
+    Output:
+        - OE/5 : Output enable register i (Active-LOW)
+        - LE/5 : Latch enable register i (A mix of Active HIGH and LOW), ANDed with CLK
+    Logic:
+
+    Device pins: ATF22V10C:
+        Vcc: 24
+        GND: 12
+        i:   01 .. 11, 13
+        i/o: 14 .. 23
+*/
+
+/* Input */
+pin  1     = CLK;
+pin  2     = DSRB;
+pin  3     = LSRB;
+pin [6..4] = [RS0..2];
+
+/* Output */
+pin [14..18] = ![OE0..4];
+pin [19..23] = ![LE0..4];
+
+/* Immediates */
+field rs = [RS0..2];
+field oe = [OE0..4];
+field le = [LE0..4];
+
+/* Logic */
+OE0 = rs:0 & DSRB;
+OE1 = rs:1 & DSRB;
+OE2 = rs:2 & DSRB;
+OE3 = rs:3 & DSRB;
+OE4 = RS2  & DSRB;
+LE0 = rs:0 & LSRB & CLK;
+LE1 = rs:1 & LSRB & CLK;
+LE2 = rs:2 & LSRB & CLK;
+LE3 = rs:3 & LSRB & CLK;
+LE4 = RS2  & LSRB & CLK;

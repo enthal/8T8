@@ -1,0 +1,48 @@
+Name      ROOT;
+Partno    ROOT;
+Date      2024;
+Revision  00;
+Designer  Tim;
+Company   Tim;
+Assembly  None;
+Location  None;
+Device    g16v8a; /* target:ATF16V8B */
+
+/*
+    Root module logic: Clock and reset management
+
+    Input:
+        CLK_in, RESET_in, HALT
+    Output:
+        CLK, not_CLK, RESET, not_RESET
+    Logic:
+        CLK = OR( CLK_in, RESET_in, HALT )
+
+    Device pins: ATF16V8B:
+        Vcc:   20
+        GND:   10
+        i/clk: 01
+        i:     02 .. 09
+        i//OE: 11
+        i/o:   12 .. 19
+*/
+
+/* Input */
+PIN 2 = CLK_in;
+PIN 3 = RESET_in;
+PIN 4 = HALT;
+
+/* Output */
+PIN 19 = CLK;
+PIN 18 = not_CLK;
+PIN 17 = RESET;
+PIN 16 = not_RESET;
+
+/* Logic */
+
+c         = CLK_in # RESET_in # HALT;
+
+CLK       =  c;
+not_CLK   = !c;
+RESET     =  RESET_in;
+not_RESET = !RESET_in;

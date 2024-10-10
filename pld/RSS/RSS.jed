@@ -1,7 +1,7 @@
 
-CUPL(WM)        5.0a  Serial# 60008009
+CUPL(WM)        5.0a  Serial# MW-10400000
 Device          g22v10  Library DLIB-h-40-1
-Created         Sun Sep 15 17:33:18 2024
+Created         Sat Sep 28 19:29:11 2024
 Name            RSS
 Partno          RSS
 Revision        00
@@ -40,4 +40,4 @@ Location        None
 *L05792 00000000000000000000000000111111
 *L05824 01010101001001010011010100110000
 *C5300
-*0E41
+*0EF6
