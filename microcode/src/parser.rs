@@ -453,8 +453,8 @@ impl ParserState {
             self.line_number += 1;
             let line =
                 line.map_err(|e| self.parse_error(&format!("Failed to read line: {}", e)))?;
-            let line = line.trim();
-            if line.is_empty() || line.starts_with('#') {
+            let line = line.split('#').next().unwrap_or_default().trim();
+            if line.is_empty() {
                 continue; // Skip comments and empty lines
             }
             let (first_char, rest) = line.split_at(1);

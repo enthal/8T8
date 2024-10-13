@@ -8,8 +8,8 @@
 ~ ex  zero one two three four five six seven
 
 > 2
-= ex=three a b c
-= ex=seven  wide=2
+= ex=three a b c 
+= ex=seven  wide=2  # into second partition
 
 = a z
 = b
