@@ -398,10 +398,6 @@ impl ParserState {
                                 // Should not occur here
                                 0
                             }
-                            BitValue::MultiBit(_) => {
-                                // MultiBit values are already expanded into bits
-                                0
-                            }
                         }
                     } else {
                         // Pad with zeros if there are fewer bits

@@ -17,5 +17,4 @@ pub(crate) enum BitValue {
     Default,
     Active,
     Inactive,
-    MultiBit(u32),
 }
