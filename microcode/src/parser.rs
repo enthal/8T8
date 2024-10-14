@@ -39,6 +39,32 @@ impl ParserState {
 }
 
 impl ParserState {
+    pub(crate) fn parse<R: BufRead>(&mut self, reader: R) -> Result<(), ParseError> {
+        let mut lines = reader.lines();
+        while let Some(line) = lines.next() {
+            self.line_number += 1;
+            let line =
+                line.map_err(|e| self.parse_error(&format!("Failed to read line: {}", e)))?;
+            let line = line.split('#').next().unwrap_or_default().trim();
+            if line.is_empty() {
+                continue; // Skip comments and empty lines
+            }
+            let (first_char, rest) = line.split_at(1);
+            match first_char {
+                "@" => self.parse_control_line(rest)?,
+                "~" => self.parse_alias_line(rest)?,
+                ">" => self.parse_address_line(rest)?,
+                "=" => self.parse_microcode_line(rest)?,
+                _ => {
+                    return Err(self.parse_error(&format!("Invalid line start '{}'", first_char)));
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl ParserState {
     fn parse_control_line(&mut self, line: &str) -> Result<(), ParseError> {
         let terms = line.split_whitespace();
         for term in terms {
@@ -436,32 +462,6 @@ impl ParserState {
             }
         }
 
-        Ok(())
-    }
-}
-
-impl ParserState {
-    pub(crate) fn parse<R: BufRead>(&mut self, reader: R) -> Result<(), ParseError> {
-        let mut lines = reader.lines();
-        while let Some(line) = lines.next() {
-            self.line_number += 1;
-            let line =
-                line.map_err(|e| self.parse_error(&format!("Failed to read line: {}", e)))?;
-            let line = line.split('#').next().unwrap_or_default().trim();
-            if line.is_empty() {
-                continue; // Skip comments and empty lines
-            }
-            let (first_char, rest) = line.split_at(1);
-            match first_char {
-                "@" => self.parse_control_line(rest)?,
-                "~" => self.parse_alias_line(rest)?,
-                ">" => self.parse_address_line(rest)?,
-                "=" => self.parse_microcode_line(rest)?,
-                _ => {
-                    return Err(self.parse_error(&format!("Invalid line start '{}'", first_char)));
-                }
-            }
-        }
         Ok(())
     }
 }
