@@ -180,23 +180,17 @@ impl ParserState {
         if line.is_empty() {
             return Err(self.parse_error("Missing address after '>'"));
         }
-        let (prefix, addr_str) = if line.starts_with('h') {
-            ('h', &line[1..])
-        } else if line.starts_with('d') {
-            ('d', &line[1..])
-        } else if line.starts_with('b') {
-            ('b', &line[1..])
-        } else {
-            ('d', line)
+
+        let (radix, addr_str) = match line.chars().next() {
+            Some('h') => (16, &line[1..]),
+            Some('d') => (10, &line[1..]),
+            Some('b') => (2, &line[1..]),
+            _ => (10, line),
         };
-        let address = match prefix {
-            'h' => u32::from_str_radix(addr_str, 16),
-            'b' => u32::from_str_radix(addr_str, 2),
-            'd' => addr_str.parse(),
-            _ => unreachable!(),
-        }
-        .map_err(|_| self.parse_error(&format!("Invalid address format '{}'", addr_str)))?;
-        self.current_address = address;
+
+        self.current_address = u32::from_str_radix(addr_str, radix)
+            .map_err(|_| self.parse_error(&format!("Invalid address format '{}'", addr_str)))?;
+
         Ok(())
     }
 }

@@ -8,7 +8,7 @@
 ~ ex  zero one two three four five six seven
 ~ wide  this that the-other three w4 w5 w6 w7 w8 w9 w10 w11 w12 w13 w14 w15
 
-> 2
+> b10
 = ex=three a b c 
 = ex=seven  wide=the-other  # into second partition
 = wide=three
@@ -22,5 +22,5 @@
 = b c
 = a b c z
 
-> h19
+> h16
 = a
