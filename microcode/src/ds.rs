@@ -6,13 +6,13 @@ pub(crate) enum ControlLine {
 }
 
 /// Represents a microcode word for a specific address
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub(crate) struct MicrocodeWord {
     pub(crate) bits: Vec<BitValue>,
 }
 
 /// Represents the value of a bit in the microcode word
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub(crate) enum BitValue {
     Default,
     Active,

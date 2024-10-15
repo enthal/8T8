@@ -148,12 +148,12 @@ impl ParserState {
             .control_lines
             .iter()
             .find(|cl| match cl {
+                ControlLine::SingleBit { name, .. } => name == multibit_name,
                 ControlLine::MultiBit { name, .. } => name == multibit_name,
-                _ => false,
             })
             .ok_or_else(|| {
                 self.parse_error(&format!(
-                    "Undefined multibit term '{}' in alias definition",
+                    "Undefined term '{}' in alias definition",
                     multibit_name
                 ))
             })?;
@@ -470,7 +470,6 @@ impl ParserState {
 // Place the expanded test suite here, as detailed in previous responses.
 #[cfg(test)]
 mod tests {
-    use super::super::parser::ParserState;
     use super::*;
     use std::io::Cursor;
 
@@ -595,11 +594,11 @@ mod tests {
 
     #[test]
     fn test_error_microcode_defined_more_than_once() {
-        let input = "@ a\n= a\n= a";
+        let input = "@ a\n= a\n> 0\n= a";
         let err = parse_input(input).unwrap_err();
         assert_eq!(
             err.to_string(),
-            "Error on line 3: Microcode already defined for address 1"
+            "Error on line 4: Microcode already defined for address 0"
         );
     }
 
@@ -628,9 +627,9 @@ mod tests {
         let input = r#"
             # Define control lines with comments and blank lines
 
-            @ /reset load increment /enable data/8
+            @ /reset load increment /enable data/4
 
-            ~ data zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen
+            ~ data  zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen
 
             > h0
 
@@ -641,7 +640,7 @@ mod tests {
         "#;
 
         let parser = parse_input(input).expect("Parsing failed");
-        assert_eq!(parser.control_lines.len(), 12);
+        assert_eq!(parser.control_lines.len(), 5);
         assert_eq!(parser.microcode_words.len(), 3);
     }
 
@@ -715,13 +714,31 @@ mod tests {
             @ x y z
             > hA
             = x
-            > b1010
+            > b1011
             = y
         "#;
 
         let parser = parse_input(input).expect("Parsing failed");
         assert_eq!(parser.microcode_words.len(), 2);
-        assert_eq!(parser.microcode_words.contains_key(&10), true); // hA and b1010 are both 10
+        assert_eq!(parser.microcode_words.contains_key(&10), true); // hA is 10
+        assert_eq!(parser.microcode_words.contains_key(&11), true); // b1010 is 11
+        assert_eq!(
+            parser.microcode_words,
+            HashMap::from([
+                (
+                    10,
+                    MicrocodeWord {
+                        bits: [BitValue::Active, BitValue::Default, BitValue::Default].to_vec()
+                    }
+                ),
+                (
+                    11,
+                    MicrocodeWord {
+                        bits: [BitValue::Default, BitValue::Active, BitValue::Default].to_vec()
+                    }
+                ),
+            ])
+        );
     }
 
     #[test]
@@ -767,7 +784,7 @@ mod tests {
         let err = parse_input(input).unwrap_err();
         assert_eq!(
             err.to_string(),
-            "Error on line 1: Undefined multibit term 'zz' in alias definition"
+            "Error on line 1: Undefined term 'zz' in alias definition"
         );
     }
 
