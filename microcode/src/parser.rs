@@ -9,6 +9,7 @@ use std::{
     fs::File,
 };
 
+#[derive(Debug)]
 pub(crate) struct ParserState {
     line_number: usize,
     control_lines: Vec<ControlLine>,
@@ -463,5 +464,340 @@ impl ParserState {
         }
 
         Ok(())
+    }
+}
+
+// Place the expanded test suite here, as detailed in previous responses.
+#[cfg(test)]
+mod tests {
+    use super::super::parser::ParserState;
+    use super::*;
+    use std::io::Cursor;
+
+    /// Helper function to create a ParserState and parse the given input
+    fn parse_input(input: &str) -> Result<ParserState, ParseError> {
+        let mut parser = ParserState::new();
+        let reader = Cursor::new(input);
+        parser.parse(reader)?;
+        Ok(parser)
+    }
+
+    #[test]
+    fn test_valid_input_all_line_types() {
+        // This test includes all four line types (@, ~, >, =)
+        let input = r#"
+            # Define control lines
+            @ /x0 x1 x2 x3 x4 a b /c zz/4
+
+            # Define aliases for multibit term zz
+            ~ zz zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen
+
+            # Set starting address
+            > d0
+
+            # Define microcode words
+            = a zz=three
+            = b zz=fifteen
+            = c zz=zero
+        "#;
+
+        let parser = parse_input(input).expect("Parsing failed");
+        assert_eq!(parser.control_lines.len(), 9);
+        assert_eq!(parser.multibit_aliases.len(), 1);
+        assert_eq!(parser.microcode_words.len(), 3);
+        assert_eq!(parser.max_address, 2);
+
+        // Verify that the aliases were correctly parsed
+        let zz_aliases = parser.multibit_aliases.get("zz").unwrap();
+        assert_eq!(zz_aliases.get("three"), Some(&3));
+        assert_eq!(zz_aliases.get("fifteen"), Some(&15));
+    }
+
+    #[test]
+    fn test_error_duplicate_control_line() {
+        let input = "@ a\n@ a";
+        let err = parse_input(input).unwrap_err();
+        assert_eq!(
+            err.to_string(),
+            "Error on line 2: Control line 'a' defined more than once"
+        );
+    }
+
+    #[test]
+    fn test_error_invalid_multibit_width() {
+        let input = "@ xx/0";
+        let err = parse_input(input).unwrap_err();
+        assert_eq!(
+            err.to_string(),
+            "Error on line 1: Width cannot be zero in multibit term 'xx'"
+        );
+    }
+
+    #[test]
+    fn test_error_alias_name_all_numerals() {
+        let input = "@ ww/2\n~ ww 12 3 4 5";
+        let err = parse_input(input).unwrap_err();
+        assert_eq!(
+            err.to_string(),
+            "Error on line 2: Alias name '12' cannot be all numerals"
+        );
+    }
+
+    #[test]
+    fn test_error_too_many_aliases() {
+        let input = "@ ww/2\n~ ww a b c d e";
+        let err = parse_input(input).unwrap_err();
+        assert_eq!(
+            err.to_string(),
+            "Error on line 2: Too many aliases for multibit term 'ww', expected 4 aliases"
+        );
+    }
+
+    #[test]
+    fn test_error_too_few_aliases() {
+        let input = "@ ww/2\n~ ww a b";
+        let err = parse_input(input).unwrap_err();
+        assert_eq!(
+            err.to_string(),
+            "Error on line 2: Not enough aliases for multibit term 'ww', expected 4 aliases"
+        );
+    }
+
+    #[test]
+    fn test_error_invalid_address_format() {
+        let input = ">\n=";
+        let err = parse_input(input).unwrap_err();
+        assert_eq!(
+            err.to_string(),
+            "Error on line 1: Missing address after '>'"
+        );
+    }
+
+    #[test]
+    fn test_error_undefined_control_line_in_microcode() {
+        let input = "@ a\n= b";
+        let err = parse_input(input).unwrap_err();
+        assert_eq!(
+            err.to_string(),
+            "Error on line 2: Undefined control line 'b'"
+        );
+    }
+
+    #[test]
+    fn test_error_value_exceeds_multibit_width() {
+        let input = "@ zz/2\n= zz=5";
+        let err = parse_input(input).unwrap_err();
+        assert_eq!(
+            err.to_string(),
+            "Error on line 2: Value '5' exceeds width 2 of multibit term 'zz'"
+        );
+    }
+
+    #[test]
+    fn test_error_microcode_defined_more_than_once() {
+        let input = "@ a\n= a\n= a";
+        let err = parse_input(input).unwrap_err();
+        assert_eq!(
+            err.to_string(),
+            "Error on line 3: Microcode already defined for address 1"
+        );
+    }
+
+    #[test]
+    fn test_error_invalid_assignment_format() {
+        let input = "@ zz/2\n= zz==3";
+        let err = parse_input(input).unwrap_err();
+        assert_eq!(
+            err.to_string(),
+            "Error on line 2: Invalid assignment 'zz==3', expected format 'name=value'"
+        );
+    }
+
+    #[test]
+    fn test_error_undefined_multibit_term_in_assignment() {
+        let input = "@ a\n= zz=3";
+        let err = parse_input(input).unwrap_err();
+        assert_eq!(
+            err.to_string(),
+            "Error on line 2: Undefined multibit control line 'zz' in assignment 'zz=3'"
+        );
+    }
+
+    #[test]
+    fn test_valid_input_with_comments_and_blank_lines() {
+        let input = r#"
+            # Define control lines with comments and blank lines
+
+            @ /reset load increment /enable data/8
+
+            ~ data zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen
+
+            > h0
+
+            = load data=fifteen   # Set data to fifteen
+            =
+            # Next microcode word
+            = increment data=one
+        "#;
+
+        let parser = parse_input(input).expect("Parsing failed");
+        assert_eq!(parser.control_lines.len(), 12);
+        assert_eq!(parser.microcode_words.len(), 3);
+    }
+
+    #[test]
+    fn test_valid_input_single_bit_active_low() {
+        let input = r#"
+            @ /enable
+            = enable
+        "#;
+
+        let parser = parse_input(input).expect("Parsing failed");
+        let microcode_word = parser.microcode_words.get(&0).unwrap();
+
+        // Since 'enable' is active low and activated in the microcode,
+        // the bit should be inactive (since active low is 1 when inactive)
+        let bit_value = microcode_word.bits[0];
+        match bit_value {
+            BitValue::Active => {}
+            _ => panic!("Expected BitValue::Active for 'enable'"),
+        }
+    }
+
+    #[test]
+    fn test_valid_input_multibit_value_as_number() {
+        let input = r#"
+            @ data/4
+            = data=10
+        "#;
+
+        let parser = parse_input(input).expect("Parsing failed");
+        let microcode_word = parser.microcode_words.get(&0).unwrap();
+
+        // The bits for 'data' should represent the binary value 1010
+        let bit_positions = parser.get_bit_positions("data").unwrap();
+        let expected_bits = vec![1, 0, 1, 0]; // From MSB to LSB
+
+        for (i, &bit_pos) in bit_positions.iter().enumerate() {
+            let bit_value = microcode_word.bits[bit_pos];
+            let expected_bit = expected_bits[i];
+            match bit_value {
+                BitValue::Active if expected_bit == 1 => {}
+                BitValue::Inactive if expected_bit == 0 => {}
+                _ => panic!(
+                    "Bit at position {} expected to be {}, found {:?}",
+                    bit_pos, expected_bit, bit_value
+                ),
+            }
+        }
+    }
+
+    #[test]
+    fn test_valid_input_address_increment() {
+        let input = r#"
+            @ a b c
+            > d0
+            = a
+            = b
+            = c
+        "#;
+
+        let parser = parse_input(input).expect("Parsing failed");
+        assert_eq!(parser.microcode_words.len(), 3);
+        assert_eq!(parser.microcode_words.contains_key(&0), true);
+        assert_eq!(parser.microcode_words.contains_key(&1), true);
+        assert_eq!(parser.microcode_words.contains_key(&2), true);
+    }
+
+    #[test]
+    fn test_valid_input_with_hex_and_binary_addresses() {
+        let input = r#"
+            @ x y z
+            > hA
+            = x
+            > b1010
+            = y
+        "#;
+
+        let parser = parse_input(input).expect("Parsing failed");
+        assert_eq!(parser.microcode_words.len(), 2);
+        assert_eq!(parser.microcode_words.contains_key(&10), true); // hA and b1010 are both 10
+    }
+
+    #[test]
+    fn test_error_control_line_name_all_numerals() {
+        let input = "@ 123";
+        let err = parse_input(input).unwrap_err();
+        assert_eq!(
+            err.to_string(),
+            "Error on line 1: Control line name '123' cannot be all numerals"
+        );
+    }
+
+    #[test]
+    fn test_error_invalid_line_start() {
+        let input = "& invalid line start";
+        let err = parse_input(input).unwrap_err();
+        assert_eq!(err.to_string(), "Error on line 1: Invalid line start '&'");
+    }
+
+    #[test]
+    fn test_error_missing_multibit_term_after_tilde() {
+        let input = "~";
+        let err = parse_input(input).unwrap_err();
+        assert_eq!(
+            err.to_string(),
+            "Error on line 1: Missing multibit term name after '~'"
+        );
+    }
+
+    #[test]
+    fn test_error_multibit_alias_for_single_bit_term() {
+        let input = "@ a\n~ a alias";
+        let err = parse_input(input).unwrap_err();
+        assert_eq!(
+            err.to_string(),
+            "Error on line 2: Control line 'a' is not a multibit term and cannot have aliases"
+        );
+    }
+
+    #[test]
+    fn test_error_undefined_multibit_term_in_alias() {
+        let input = "~ zz alias1 alias2";
+        let err = parse_input(input).unwrap_err();
+        assert_eq!(
+            err.to_string(),
+            "Error on line 1: Undefined multibit term 'zz' in alias definition"
+        );
+    }
+
+    #[test]
+    fn test_error_invalid_value_in_assignment() {
+        let input = "@ zz/2\n= zz=invalid";
+        let err = parse_input(input).unwrap_err();
+        assert_eq!(
+            err.to_string(),
+            "Error on line 2: Invalid value 'invalid' for multibit term 'zz'"
+        );
+    }
+
+    #[test]
+    fn test_error_missing_address_after_greater_than() {
+        let input = ">";
+        let err = parse_input(input).unwrap_err();
+        assert_eq!(
+            err.to_string(),
+            "Error on line 1: Missing address after '>'"
+        );
+    }
+
+    #[test]
+    fn test_error_invalid_address_prefix() {
+        let input = "> x123";
+        let err = parse_input(input).unwrap_err();
+        assert_eq!(
+            err.to_string(),
+            "Error on line 1: Invalid address format 'x123'"
+        );
     }
 }
