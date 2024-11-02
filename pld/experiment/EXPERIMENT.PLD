@@ -1,0 +1,44 @@
+Name      EXPERIMENT;
+Partno    EXPERIMENT;
+Date      2024;
+Revision  00;
+Designer  Tim;
+Company   Tim;
+Assembly  None;
+Location  None;
+Device    g16v8a; /* target:ATF16V8B */
+
+/*
+    Device pins: ATF16V8B:
+        Vcc:   20
+        GND:   10
+        i/clk: 01
+        i:     02 .. 09
+        i//OE: 11
+        i/o:   12 .. 19
+*/
+
+/* Input */
+PIN [2..9]   = [A0..7];
+
+/* Output */
+PIN [12..19] = [Q0..7];
+
+/* Immediates */
+field address = [A0..7];
+field output  = [Q0..7];
+
+/* Logic */
+/* output
+    =  & address:0
+    # [   IRS0..2] & sel:1
+    # [ IORSA0..2] & sel:2
+    # [ IORSB0..2] & sel:3
+    ; */
+table address => output {
+    'h'00=> 'h'FF;
+    'h'01=> 'b'10101010;
+    'h'02=> b01010101;
+    'h'03=> b10101010;
+}
+
