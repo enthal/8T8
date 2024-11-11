@@ -9,6 +9,17 @@ Location  None;
 Device    g16v8a; /* target:ATF16V8B */
 
 /*
+    Can we use the ATF16V8B as a ROM, as for microcode?  Sort of...
+
+    There's an "excessive number of product terms" when after too many table entries.
+    Perhaps it would be ok for microcode if most instruction codes (top 4 MC address bits)
+    don't define most of the 16 phases (bottom 4 address bits), but complete with fewer,
+    often 6 or fewer.
+
+    I observe a maximum of 45 table entries.  
+    That would only work if the 16 instruction codes had an average of 3 phases.  
+    No go.
+
     Device pins: ATF16V8B:
         Vcc:   20
         GND:   10
@@ -38,7 +49,70 @@ field output  = [Q0..7];
 table address => output {
     'h'00=> 'h'FF;
     'h'01=> 'b'10101010;
-    'h'02=> b01010101;
-    'h'03=> b10101010;
+    'h'02=> 'b'01010101;
+    'h'03=> 'b'11110000;
+    'h'04=> 'b'00001111;
+    'h'05=> 'b'11001100;
+    'h'06=> 'b'00110011;
+    'h'07=> 'b'00000000;
+    'h'08=> 'b'00000001;
+    'h'09=> 'b'00000010;
+    'h'0a=> 'b'00000100;
+    'h'0b=> 'b'00001000;
+    'h'0c=> 'b'00010000;
+    'h'0d=> 'b'00100000;
+    'h'0e=> 'b'01000000;
+    'h'0f=> 'b'10000000;
+    'h'10=> 'b'10000001;
+    'h'11=> 'b'00000011;
+    'h'12=> 'b'00000110;
+    'h'13=> 'b'00001100;
+    'h'14=> 'b'00011000;
+    'h'15=> 'b'00110000;
+    'h'16=> 'b'01100000;
+    'h'17=> 'b'11000000;
+    'h'18=> 'b'10000000;
+    'h'19=> 'b'00000111;
+    'h'1a=> 'b'00001110;
+    'h'1b=> 'b'00011100;
+    'h'1c=> 'b'00111000;
+    'h'1d=> 'b'01110000;
+    'h'1e=> 'b'11100000;
+    'h'1f=> 'b'11000000;
+    'h'20=> 'b'11011001;
+    'h'21=> 'b'10101010;
+    'h'22=> 'b'01010101;
+    'h'23=> 'b'11110000;
+    'h'24=> 'b'00001111;
+    'h'25=> 'b'11001100;
+    'h'26=> 'b'00110011;
+    'h'27=> 'b'00000000;
+    'h'28=> 'b'00000001;
+    'h'29=> 'b'00000010;
+    'h'2a=> 'b'00000100;
+    'h'fe=> 'b'00001000;
+    'h'ff=> 'b'00010000;
+    /*
+    **** Even 1 line below this:  "excessive number of product terms"
+    'h'2d=> 'b'00100000;
+    'h'2e=> 'b'01000000;
+    'h'2f=> 'b'10000000;
+    'h'30=> 'b'10000001;
+    'h'31=> 'b'00000011;
+    'h'32=> 'b'00000110;
+    'h'33=> 'b'00001100;
+    'h'34=> 'b'00011000;
+    'h'35=> 'b'00110000;
+    'h'36=> 'b'01100000;
+    'h'37=> 'b'11000000;
+    'h'38=> 'b'10000000;
+    'h'39=> 'b'00000111;
+    'h'3a=> 'b'00001110;
+    'h'3b=> 'b'00011100;
+    'h'3c=> 'b'00111000;
+    'h'3d=> 'b'01110000;
+    'h'3e=> 'b'11100000;
+    'h'3f=> 'b'11000000;
+    'h'40=> 'b'11011001;
+    */
 }
-
