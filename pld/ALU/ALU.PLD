@@ -37,6 +37,8 @@ PIN [    23] = [RCin];
 
 /* Functions */
 
+sub = S0;
+
 function fa_c(A, B, Ci) {
     fa_c = (Ci & A) # (Ci & (B $ sub)) # (A & (B $ sub));
 }
@@ -47,8 +49,6 @@ function fa_o(A, B, Ci) {
 /* Logic */
 
 field select = [S0..2];
-
-sub = S0;
 
 C0 = Cin $ sub;
 
@@ -64,6 +64,18 @@ C3 = fa_c(A2, B2, C2);
 Q3 = fa_o(A3, B3, C3);
 C4 = fa_c(A3, B3, C3);
 
+/*
+Cout = C4 $ sub;
+*/
+
 Cout = C4 $ sub;
 
-[Y0..3] = [Q0..3];
+[Y0..3] =
+    select:0 & [Q0..3]             #  /* add */
+    select:1 & [Q0..3]             #  /* sub */
+    select:2 & [  Cin, A0..2]      #  /* left-shift */
+    select:3 & [A1..3,  RCin]      #  /* right-shift */
+    select:4 & ([A0..3] & [B0..3]) #  /* and */
+    select:5 & ([A0..3] # [B0..3]) #  /* or */
+    select:6 & ([A0..3] $ [B0..3]) #  /* xor */
+    select:7 & (![A0..3])          ;  /* not */
