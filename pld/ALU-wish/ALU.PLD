@@ -9,6 +9,8 @@ Location  None;
 Device    g22V10; /* target:ATF22V10C */
 
 /*
+    YOU WISH!  This does not fit in a g22V10/ATF22V10C: Failed to build: "excessive number of product terms".
+
     4-bit ALU with carry-i/o and flags-o.
     Operations:
         add, subtract,
