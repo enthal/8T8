@@ -1,0 +1,80 @@
+Name      ALU-arith;
+Partno    ALU-arith;
+Date      2024;
+Revision  00;
+Designer  Tim;
+Company   Tim;
+Assembly  None;
+Location  None;
+Device    g22V10; /* target:ATF22V10C */
+
+/*
+    4-bit ALU arithmetic with forward carry-i/o and (for right-shift) reverse carry-i/o.
+    Operations:
+        add, subtract,
+        shift-left, shift-right.
+
+    Device pins: ATF22V10C:
+        Vcc: 24
+        GND: 12
+        i:   01 .. 11, 13
+        i/o: 14 .. 23
+*/
+
+/* Input */
+PIN [ 2.. 1] = [S0..1];
+PIN [ 7.. 4] = [A0..3];
+PIN [11.. 8] = [B0..3];
+PIN [    13] = [Cin];
+
+/* Output */
+PIN [    14] = [RCout];
+PIN [15..18] = [Y0..3];
+PIN [19..21] = [C1..3];
+PIN [    22] = [Cout];
+PIN [    23] = [RCin];
+
+/* Functions */
+
+field select = [S0..1];
+
+sub = select:1;
+
+function fa_c(A, B, Ci) {
+    fa_c = (Ci & A) # (Ci & (B $ sub)) # (A & (B $ sub));
+}
+function fa_o(A, B, Ci) {
+    fa_o = Ci $ (A $ (B $ sub));
+}
+
+/* Logic */
+
+C0 = Cin $ sub;
+
+Q0 = fa_o(A0, B0, C0);
+C1 = fa_c(A0, B0, C0);
+
+Q1 = fa_o(A1, B1, C1);
+C2 = fa_c(A1, B1, C1);
+
+Q2 = fa_o(A2, B2, C2);
+C3 = fa_c(A2, B2, C2);
+
+Q3 = fa_o(A3, B3, C3);
+C4 = fa_c(A3, B3, C3);
+
+add_Cout = C4 $ sub;
+
+[Y0..3] =
+    select:0 & [Q0..3]             #  /* add */
+    select:1 & [Q0..3]             #  /* sub */
+    select:2 & [  Cin, A0..2]      #  /* left-shift */
+    select:3 & [A1..3,  RCin]      ;  /* right-shift */
+
+[Cout] =
+    select:0 & [add_Cout]          #  /* add */
+    select:1 & [add_Cout]          #  /* sub */
+    select:2 & [A3]                ;  /* left-shift */
+
+[RCout] =
+    select:3 & [A0]                ;  /* right-shift */
