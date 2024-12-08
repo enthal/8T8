@@ -9,7 +9,7 @@ Location  None;
 Device    g22V10; /* target:ATF22V10C */
 
 /*
-    4-bit ALU arithmetic with forward carry-i/o and (for right-shift) reverse carry-i/o.
+    4-bit ALU arithmetic unit with forward carry-i/o and (for right-shift) reverse carry-i/o.
     Operations:
         add, subtract,
         shift-left, shift-right.

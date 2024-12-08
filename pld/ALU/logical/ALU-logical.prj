@@ -1,0 +1,10 @@
+{
+    "manufacturer": "lattice",
+    "packageType": "dip",
+    "pinCount": 20,
+    "deviceCode": "g16v8a",
+    "deviceName": "ATF16V8B, ATF16V8BQ, ATF16V8BQL, ATF16LV8C, ATF16V8C, ATF16V8CZ",
+    "programmer": "minipro",
+    "pinsConfiguration": "16v8",
+    "deviceUniqueName": "ATF16V8B"
+}

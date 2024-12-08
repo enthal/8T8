@@ -1,0 +1,41 @@
+Name      ALU-logical;
+Partno    ALU-logical;
+Date      2024;
+Revision  00;
+Designer  Tim;
+Company   Tim;
+Assembly  None;
+Location  None;
+Device    g16v8a; /* target:ATF16V8B */
+
+/*
+    4-bit ALU logic unit.
+    Operations:
+        and, or, xor, not
+
+        Device pins: ATF16V8B:
+        Vcc:   20
+        GND:   10
+        i/clk: 01
+        i:     02 .. 09
+        i//OE: 11
+        i/o:   12 .. 19
+*/
+
+/* Input */
+PIN [17..19] = [S0..2];
+PIN [ 5.. 2] = [A0..3];
+PIN [ 9.. 6] = [B0..3];
+
+/* Output */
+PIN [12..15] = [Y0..3];
+
+/* Immediates */
+field select = [S0..2];
+
+/* Logic */
+[Y0..3] =
+    select:0 & ([A0..3] & [B0..3]) #  /* and */
+    select:1 & ([A0..3] # [B0..3]) #  /* or */
+    select:2 & ([A0..3] $ [B0..3]) #  /* xor */
+    select:3 & (![A0..3])          ;  /* not */
