@@ -1,0 +1,48 @@
+Name      ALU-mux;
+Partno    ALU-mux;
+Date      2024;
+Revision  00;
+Designer  Tim;
+Company   Tim;
+Assembly  None;
+Location  None;
+Device    g16v8a; /* target:ATF16V8B */
+
+/*
+    4 x 2-to-1 multiplexor (mux).
+    Similar to 74'157 (but different pinout).
+                               ______________
+                              |   ALU-mux    |
+                       A3 x---|1           20|---x Vcc
+                       A2 x---|2           19|---x
+                       A1 x---|3           18|---x
+                       A0 x---|4           17|---x
+                       B3 x---|5           16|---x Y3
+                       B2 x---|6           15|---x Y2
+                       B1 x---|7           14|---x Y1
+                       B0 x---|8           13|---x Y0
+                   select x---|9           12|---x
+                      GND x---|10          11|---x
+                              |______________|
+
+    Device pins: ATF16V8B:
+        Vcc:   20
+        GND:   10
+        i/clk: 01
+        i:     02 .. 09
+        i//OE: 11
+        i/o:   12 .. 19
+*/
+
+/* Input */
+PIN [ 4.. 1] = [A0..3];
+PIN [ 8.. 5] = [B0..3];
+PIN 9 = select;
+
+/* Output */
+PIN [13..16] = [Y0..3];
+
+/* Logic */
+[Y0..3] =
+    select:0 & ([A0..3]) #
+    select:1 & ([B0..3]) ;
