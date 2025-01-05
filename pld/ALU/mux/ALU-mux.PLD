@@ -9,12 +9,12 @@ Location  None;
 Device    g16v8a; /* target:ATF16V8B */
 
 /*
-    4 x 2-to-1 multiplexor (mux).
+    4 x 2-to-1 multiplexor (mux), with zero-out flag.
     Similar to 74'157 (but different pinout).
                                ______________
                               |   ALU-mux    |
                        A3 x---|1           20|---x Vcc
-                       A2 x---|2           19|---x
+                       A2 x---|2           19|---x zero
                        A1 x---|3           18|---x
                        A0 x---|4           17|---x
                        B3 x---|5           16|---x Y3
@@ -37,12 +37,18 @@ Device    g16v8a; /* target:ATF16V8B */
 /* Input */
 PIN [ 4.. 1] = [A0..3];
 PIN [ 8.. 5] = [B0..3];
-PIN 9 = select;
+PIN 9        = select;
 
 /* Output */
 PIN [13..16] = [Y0..3];
+PIN 19       = zero;
 
 /* Logic */
+
 [Y0..3] =
     select:0 & ([A0..3]) #
     select:1 & ([B0..3]) ;
+
+zero =
+    select:0 & !([A0..3]:#) #
+    select:1 & !([B0..3]:#) ;
