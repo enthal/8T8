@@ -9,15 +9,15 @@ Location  None;
 Device    g16v8a; /* target:ATF16V8B */
 
 /*
-    Can we use the ATF16V8B as a ROM, as for microcode?  Sort of...
+    Can we use the ATF16V8B as a ROM, as for microcode?   Sort of...
 
     There's an "excessive number of product terms" when after too many table entries.
     Perhaps it would be ok for microcode if most instruction codes (top 4 MC address bits)
     don't define most of the 16 phases (bottom 4 address bits), but complete with fewer,
     often 6 or fewer.
 
-    I observe a maximum of 45 table entries.  
-    That would only work if the 16 instruction codes had an average of 3 phases.  
+    I observe a maximum of 45 table entries.
+    That would only work if the 16 instruction codes had an average of 3 phases.
     No go.
 
     Device pins: ATF16V8B:

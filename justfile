@@ -1,15 +1,38 @@
 set shell := ["/usr/bin/env", "bash"]
 
-default: count-pld
+default: pld
 
-count-pld:
+pld:
     #!/usr/bin/env bash
-    find . -type f -iname '*.pld' | while read -r file; do
-        dir=$(dirname "$file")
-        if [ ! -f "$dir/.skipmake" ]; then
-            echo "Processing $file:"
-            wc "$file"
-        else
-            echo "Skipping $file (because $dir/.skipmake exists)"
+    find pld -type f -iname '*.pld' | while read -r pld; do
+        dir=$(dirname "$pld")
+        if [ ! -f "$dir/.nobuild" ]; then
+            jed=$(echo $pld | sed "s:\\.pld\$:.jed:ig")
+            # ls -l $pld $jed
+            # [ -f "$jed" ] && echo "exists"
+            # [ ! -f "$jed" ] && echo "not exists"
+            # [ "$pld" -nt "$jed" ] && echo newer
+            if [ ! -f "$jed" ] || [ "$pld" -nt "$jed" ]; then
+                echo
+                echo "🤖 CUPL build: $pld ..."
+                just pld-file "$pld"
+            fi
         fi
     done
+
+pld-file FILE:
+    #!/usr/bin/env bash
+    set -ex
+
+    dir=$(mktemp -d ~/.wine/drive_c/temp/build-XXXXXX)
+    cp "{{FILE}}" "${dir}/"
+
+    # See: http://bitsavers.informatik.uni-stuttgart.de/test_equipment/logicalDevices/CUPL_2.0_card.pdf
+    WINEPATH="C:\Wincupl\WinCupl\Fitters" \
+    wine \
+        "C:\Wincupl\shared\cupl.exe" \
+            -m3lxfjnabe \
+            -u "C:\Wincupl\shared/Atmel.dl" \
+            "c:\/temp/$(basename $dir)/$(basename "{{FILE}}")"
+
+    cp ${dir}/*.jed ${dir}/*.doc $(dirname "{{FILE}}")/
