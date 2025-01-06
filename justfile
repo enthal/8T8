@@ -36,3 +36,13 @@ pld-file FILE:
             "c:\/temp/$(basename $dir)/$(basename "{{FILE}}")"
 
     cp ${dir}/*.jed ${dir}/*.doc $(dirname "{{FILE}}")/
+
+minipro-jed FILE:
+    #!/usr/bin/env bash
+    set -ex
+    device=$(grep -E '^Device +' {{FILE}} | awk '{print $2}')
+    declare -A device_map=( # Requires bash 4.0 !  brew install bash
+        [g16v8as]=ATF16V8B
+        [g22v10]=ATF22V10C
+    )
+    minipro  -p "${device_map[$device]:? 💥 Error: no such device: $device}" -w "{{FILE}}"
