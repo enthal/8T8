@@ -41,7 +41,7 @@ minipro-jed FILE:
     #!/usr/bin/env bash
     set -ex
     device=$(grep -E '^Device +' {{FILE}} | awk '{print $2}')
-    declare -A device_map=( # Requires bash 4.0 !  brew install bash
+    declare -A device_map=( # Requires bash 4.0+ !  Try: brew install bash
         [g16v8as]=ATF16V8B
         [g22v10]=ATF22V10C
     )

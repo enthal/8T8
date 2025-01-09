@@ -1,0 +1,68 @@
+Name      ALU-control;
+Partno    ALU-control;
+Date      2024;
+Revision  00;
+Designer  Tim;
+Company   Tim;
+Assembly  None;
+Location  None;
+Device    g16v8a; /* target:ATF16V8B */
+
+/*
+    ALU control logic.
+    Includes 1-bit carry register.
+
+    2 "Carry Selector" input lines (typically from instruction operand) select 1 of 4 options for carry value input to ALU-arith:
+        0 (00): off
+        1 (01): on
+        2 (10): carry out from previous calculation
+        3 (11): carry out from previous calculation - inverted
+
+    Overflow:
+        V = C6 xor C7
+        Per: https://www.righto.com/2012/12/the-6502-overflow-flag-explained.html#:~:text=from%20this%20table
+
+    Device pins: ATF16V8B:
+        Vcc:   20
+        GND:   10
+        i/clk: 01
+        i:     02 .. 09
+        i//OE: 11
+        i/o:   12 .. 19
+*/
+
+/* Input */
+
+PIN  1 = CE;            // Enable carry (to be active when ALU-arith is being used, as per ALU-mux select in)
+PIN [3..2] = [S0..1];   // Carry Selector: 0:off 1:on 2:prev 3:!prev (for: Ccur: input to current operation)
+PIN  4 = C7;            // Carry C7 (for: C, V)
+PIN  5 = C6;            // Carry C6 (for: V)
+PIN  6 = RC;            // Reverse carry (for: C)
+PIN  7 = ZH;            // ZH zero HIGH (for: Z)
+PIN  8 = ZL;            // ZL zero LOW (for: Z)
+PIN  9 = PrC;           // previous carry
+
+/* Output */
+
+PIN 18 = Ccur;          // Carry out as _input_ to adder etc for current operation
+
+// Results from current operation:
+PIN 16 = C;             // C carry (per Carry Selector)
+PIN 15 = Z;             // Z zero (Z = ZH & ZL)
+PIN 14 = V;             // V overflow (V = C6 xor C7)
+
+/* Logic */
+
+field select = [S0..1];
+
+Ccur =
+    select:0 & 'h'0 #
+    select:1 & 'h'1 #
+    select:2 &  PrC #
+    select:3 & !PrC ;
+
+C = CE & (C7 # RC);
+
+Z = ZH & ZL;
+
+V = CE & (C6 $ C7);
