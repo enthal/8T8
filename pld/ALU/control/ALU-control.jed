@@ -1,7 +1,7 @@
 
 CUPL(WM)        5.0a  Serial# MW-10400000
 Device          g16v8as  Library DLIB-h-40-2
-Created         Wed Jan 08 23:42:45 2025
+Created         Thu Jan 09 00:07:01 2025
 Name            ALU-control
 Partno          ALU-control
 Revision        00
@@ -28,4 +28,4 @@ Location        None
 *L02144 11111111111111111111111111111111
 *L02176 111111111111111110
 *C2C81
-*B596
+*B59C

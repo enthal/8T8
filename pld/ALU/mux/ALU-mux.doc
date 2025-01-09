@@ -5,7 +5,7 @@
 
 CUPL(WM)        5.0a Serial# MW-10400000
 Device          g16v8as  Library DLIB-h-40-2
-Created         Sun Jan 05 17:46:17 2025
+Created         Thu Jan 09 00:07:00 2025
 Name            ALU-mux
 Partno          ALU-mux
 Revision        00
@@ -35,7 +35,7 @@ Y3 =>
     B3 & select
   # A3 & !select
 
-zero =>
+Z =>
     !B0 & !B1 & !B2 & !B3 & select
   # !A0 & !A1 & !A2 & !A3 & !select
 
@@ -60,8 +60,8 @@ Pol   Name              Ext     Pin     Type     Used   Pterms  Level
     Y1                          14       V        2       8       3     
     Y2                          15       V        2       8       3     
     Y3                          16       V        2       8       3     
+    Z                           18       V        2       8       3     
     select                      9        V        -       -       -     
-    zero                        19       V        2       8       3     
 
 
 LEGEND    D : default variable         F : field      G : group
@@ -76,18 +76,18 @@ LEGEND    D : default variable         F : field      G : group
 
 Syn   02192 - Ac0   02193 x 
 
-Pin #19  02048  Pol -  02120  Ac1 x 
- 00000 -------------x---x---x---x--x--- 
- 00032 -x-x-x---x-------------------x-- 
+Pin #19  02048  Pol x  02120  Ac1 - 
+ 00000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00032 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00064 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00096 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00128 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00160 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00192 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00224 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
-Pin #18  02049  Pol x  02121  Ac1 - 
- 00256 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
- 00288 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+Pin #18  02049  Pol -  02121  Ac1 x 
+ 00256 -------------x---x---x---x--x--- 
+ 00288 -x-x-x---x-------------------x-- 
  00320 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00352 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
  00384 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
@@ -160,8 +160,8 @@ LEGEND    X : fuse not blown
                                ______________
                               |   ALU-mux    |
                        A3 x---|1           20|---x Vcc                      
-                       A2 x---|2           19|---x zero                     
-                       A1 x---|3           18|---x                          
+                       A2 x---|2           19|---x                          
+                       A1 x---|3           18|---x Z                        
                        A0 x---|4           17|---x                          
                        B3 x---|5           16|---x Y3                       
                        B2 x---|6           15|---x Y2                       

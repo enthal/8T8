@@ -4,18 +4,16 @@ default: pld
 
 pld:
     #!/usr/bin/env bash
+    set -e
     find pld -type f -iname '*.pld' | while read -r pld; do
         dir=$(dirname "$pld")
         if [ ! -f "$dir/.nobuild" ]; then
             jed=$(echo $pld | sed "s:\\.pld\$:.jed:ig")
-            # ls -l $pld $jed
-            # [ -f "$jed" ] && echo "exists"
-            # [ ! -f "$jed" ] && echo "not exists"
-            # [ "$pld" -nt "$jed" ] && echo newer
             if [ ! -f "$jed" ] || [ "$pld" -nt "$jed" ]; then
                 echo
                 echo "🤖 CUPL build: $pld ..."
-                just pld-file "$pld"
+                just -v pld-file "$pld"
+                echo "✅      built: $pld"
             fi
         fi
     done
